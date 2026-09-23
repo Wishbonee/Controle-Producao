@@ -105,7 +105,7 @@ export function Clientes() {
     <div className="cfg-section">
       <div className="cfg-header">
         <div>
-          <h3>Clientes</h3>
+          <h3>Cadastro</h3>
           <p className="cfg-sub">{clientes.length} cadastrado{clientes.length !== 1 ? 's' : ''}</p>
         </div>
         <button className="btn btn-sm btn-primary" onClick={openNew}>
@@ -114,13 +114,12 @@ export function Clientes() {
         </button>
       </div>
 
-      <div className="controls-bar" style={{ marginBottom: 0 }}>
+      <div className="controls-bar flush">
         <div className="filter-group fg-search">
           <label>Buscar</label>
-          <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', pointerEvents: 'none' }} />
+          <div className="search-wrap">
+            <Search size={15} className="search-icon" />
             <input
-              style={{ paddingLeft: 30, width: '100%' }}
               placeholder="Nome, contato ou WhatsApp..."
               value={busca}
               onChange={e => setBusca(e.target.value)}
@@ -178,8 +177,8 @@ export function Clientes() {
             </label>
           </div>
 
-          <div className="cfg-form-footer" style={{ justifyContent: 'flex-end' }}>
-            <div style={{ display: 'flex', gap: 8 }}>
+          <div className="cfg-form-footer end">
+            <div className="btn-group">
               <button className="btn btn-sm" onClick={() => { setShowForm(false); setEditCliente(null); }}>Cancelar</button>
               <button className="btn btn-sm btn-primary" onClick={handleSave} disabled={saving}>
                 {saving ? 'Salvando…' : editCliente ? 'Salvar alterações' : 'Cadastrar cliente'}
@@ -231,12 +230,12 @@ export function Clientes() {
                           <MessageCircle size={12} />
                           {c.whatsapp}
                         </a>
-                      ) : <span style={{ color: 'var(--muted)' }}>—</span>}
+                      ) : <span className="muted">—</span>}
                     </td>
-                    <td style={{ fontSize: 12 }}>{c.contato || <span style={{ color: 'var(--muted)' }}>—</span>}</td>
+                    <td>{c.contato || <span className="muted">—</span>}</td>
                     <td><strong>{s?.pedidos ?? 0}</strong></td>
-                    <td style={{ color: 'var(--muted)' }}>{(s?.bonos ?? 0).toLocaleString('pt-BR')}</td>
-                    <td style={{ fontSize: 11, color: 'var(--muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <td className="muted">{(s?.bonos ?? 0).toLocaleString('pt-BR')}</td>
+                    <td className="td-ellipsis">
                       {c.observacoes}
                     </td>
                     <td>

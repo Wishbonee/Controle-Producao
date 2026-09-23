@@ -99,8 +99,7 @@ export function Calendario() {
           return (
             <div
               key={i}
-              className={`cal-cell${!cell.current ? ' other' : ''}${cell.today ? ' today' : ''}`}
-              style={selected ? { outline: '2px solid #F5E400', outlineOffset: 1 } : undefined}
+              className={`cal-cell${!cell.current ? ' other' : ''}${cell.today ? ' today' : ''}${selected ? ' selected' : ''}`}
               onClick={() => setSelKey(selected ? null : key)}
             >
               <div className="cal-num">{cell.date.getDate()}</div>
@@ -110,7 +109,7 @@ export function Calendario() {
                 </div>
               ))}
               {cell.events.length > 3 && (
-                <div style={{ fontSize: 9, color: 'var(--muted)' }}>+{cell.events.length - 3} mais</div>
+                <div className="cal-more">+{cell.events.length - 3} mais</div>
               )}
             </div>
           );
@@ -129,9 +128,9 @@ export function Calendario() {
           {selEvents.map(p => (
             <div key={p.id} className="cal-detail-row">
               <span className="num">#{p.num}</span>
-              <span style={{ flex: 1, fontWeight: 700 }}>{p.nome}</span>
+              <span className="nome">{p.nome}</span>
               <span className={`status-wrap ${stClass(p.status_producao)}`}>{p.status_producao}</span>
-              <span style={{ color: 'var(--muted)', fontSize: 11, marginLeft: 8 }}>{p.dias}</span>
+              <span className="dias">{p.dias}</span>
             </div>
           ))}
         </div>

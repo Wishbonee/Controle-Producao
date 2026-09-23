@@ -5,6 +5,8 @@ export interface SelectOption {
   value: string;
   label: string;
   dot?: string;
+  /** Texto de apoio ao lado do rótulo, só na lista aberta */
+  hint?: string;
 }
 
 interface SelectProps {
@@ -70,6 +72,7 @@ export function Select({
             >
               {opt.dot && <span className="cs-dot" style={{ background: opt.dot }} />}
               <span className="custom-select-text">{opt.label}</span>
+              {opt.hint && <span className="cs-hint">{opt.hint}</span>}
               {opt.value === value && <Check size={12} className="cs-check" />}
             </div>
           ))}
@@ -80,16 +83,16 @@ export function Select({
 }
 
 export const STATUS_PRODUCAO_OPTS: SelectOption[] = [
-  { value: 'Em Produção', label: 'Em Produção', dot: '#fde047' },
+  { value: 'Em Produção', label: 'Em Produção', dot: '#f59e0b' },
   { value: 'Aguardando',  label: 'Aguardando',  dot: '#fb923c' },
   { value: 'ATRASADO',   label: 'Atrasado',    dot: '#f87171' },
   { value: 'Enviado',    label: 'Enviado',     dot: '#60a5fa' },
-  { value: 'Entregue',   label: 'Entregue',    dot: '#4ade80' },
-  { value: 'Cancelado',  label: 'Cancelado',   dot: '#9ca3af' },
+  { value: 'Entregue',   label: 'Entregue',    dot: '#34d399' },
+  { value: 'Cancelado',  label: 'Cancelado',   dot: '#94a3b8' },
 ];
 
 export const PGTO_OPTS_SELECT: SelectOption[] = [
   { value: 'PENDENTE', label: 'Pendente', dot: '#fb923c' },
-  { value: 'PAGO',     label: 'Pago',     dot: '#4ade80' },
-  { value: 'PARCIAL',  label: 'Parcial',  dot: '#fde047' },
+  { value: 'PAGO',     label: 'Pago',     dot: '#34d399' },
+  { value: 'PARCIAL',  label: 'Parcial',  dot: '#f59e0b' },
 ];

@@ -55,7 +55,7 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
           <button className="close-btn" onClick={onClose} disabled={importing}>×</button>
         </div>
 
-        <div className="modal-body" style={{ display: 'block' }}>
+        <div className="modal-body block">
           {/* ── Zona de upload ── */}
           <div
             className={`import-drop${dragOver ? ' drag-over' : ''}${fileName ? ' has-file' : ''}`}

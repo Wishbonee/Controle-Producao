@@ -46,22 +46,22 @@ function exportPDF(
   const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>Relatório Wishbone</title>
     <style>
-      body { font-family: Arial, sans-serif; font-size: 12px; margin: 0; padding: 20px; }
-      .rep-header { background: #111; color: #fff; border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; }
+      body { font-family: Inter, 'Segoe UI', Arial, sans-serif; font-size: 12px; margin: 0; padding: 20px; color: #0f172a; }
+      .rep-header { background: #0f172a; color: #fff; border-radius: 12px; border-left: 4px solid #14b8a6; padding: 14px 18px; margin-bottom: 16px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .rep-header h1 { font-size: 16px; margin: 0 0 10px; }
       .rep-meta { display: flex; gap: 24px; flex-wrap: wrap; }
       .rep-meta-item { display: flex; flex-direction: column; gap: 2px; }
-      .rep-meta-label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: .8px; }
-      .rep-meta-value { font-size: 13px; font-weight: 700; color: #E4F901; }
+      .rep-meta-label { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: .8px; }
+      .rep-meta-value { font-size: 13px; font-weight: 700; color: #5eead4; }
       .rep-stats { display: flex; gap: 16px; margin-bottom: 16px; }
-      .rep-stat-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 14px; text-align: center; }
-      .rep-stat-box .v { font-size: 20px; font-weight: 900; }
-      .rep-stat-box .l { font-size: 10px; color: #6b7280; }
+      .rep-stat-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; text-align: center; }
+      .rep-stat-box .v { font-size: 20px; font-weight: 700; color: #0f766e; }
+      .rep-stat-box .l { font-size: 10px; color: #64748b; }
       table { width: 100%; border-collapse: collapse; }
-      th { background: #111; color: #fff; padding: 7px 9px; font-size: 10px; text-align: left; }
-      td { padding: 6px 9px; border-bottom: 1px solid #eee; font-size: 11px; }
-      tr:nth-child(even) { background: #fafafa; }
-      .gen { font-size: 10px; color: #999; margin-top: 12px; }
+      th { background: #f1f5f9; color: #475569; padding: 7px 9px; font-size: 10px; text-align: left; text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid #14b8a6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      td { padding: 6px 9px; border-bottom: 1px solid #f1f5f9; font-size: 11px; }
+      tr:nth-child(even) { background: #f8fafc; }
+      .gen { font-size: 10px; color: #94a3b8; margin-top: 12px; }
     </style></head><body>
     <div class="rep-header">
       <h1>Relatório de Produção — Wishbone</h1>
@@ -247,12 +247,12 @@ export function Relatorios() {
 
         <div className="rep-stats">
           <div className="rep-stat"><div className="v">{stats.total}</div><div className="l">Pedidos</div></div>
-          <div className="rep-stat"><div className="v" style={{ color: 'var(--danger-text)' }}>{stats.atrasados}</div><div className="l">Atrasados</div></div>
-          <div className="rep-stat"><div className="v" style={{ color: 'var(--success-text)' }}>{stats.entregues}</div><div className="l">Entregues</div></div>
+          <div className="rep-stat"><div className="v danger">{stats.atrasados}</div><div className="l">Atrasados</div></div>
+          <div className="rep-stat"><div className="v success">{stats.entregues}</div><div className="l">Entregues</div></div>
           <div className="rep-stat"><div className="v">{stats.pecas.toLocaleString('pt-BR')}</div><div className="l">Peças</div></div>
         </div>
 
-        <div className="rep-actions" style={{ marginTop: 16 }}>
+        <div className="rep-actions">
           <button className="rep-btn rep-btn-pdf" onClick={handleExportPDF}>
             <FileText size={16} /> Exportar PDF
           </button>

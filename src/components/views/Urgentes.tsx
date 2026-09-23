@@ -43,8 +43,8 @@ export function Urgentes() {
     <>
       <div className="urgentes-header">
         <div className="info">
-          <h2>Pedidos Urgentes</h2>
-          <p>Atrasados e com entrega em até 3 dias</p>
+          <h2>{urgentes.length === 1 ? 'Pedido precisa' : 'Pedidos precisam'} de atenção</h2>
+          <p>Ordenados pela data de entrega, os mais antigos primeiro</p>
         </div>
         <div className="urgentes-count">{urgentes.length}</div>
       </div>
