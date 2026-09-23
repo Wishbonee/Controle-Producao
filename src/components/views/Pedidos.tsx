@@ -12,7 +12,7 @@ function StatusCell({ p, onChange }: {
   onChange: (s: StatusProducao) => void;
 }) {
   return (
-    <div style={{ minWidth: 140 }}>
+    <div className="status-cell">
       <Select
         value={p.status_producao}
         onChange={v => onChange(v as StatusProducao)}
@@ -91,10 +91,9 @@ export function Pedidos() {
       <div className="controls-bar">
         <div className="filter-group fg-search">
           <label>Buscar</label>
-          <div style={{ position: 'relative' }}>
-            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', pointerEvents: 'none' }} />
+          <div className="search-wrap">
+            <Search size={15} className="search-icon" />
             <input
-              style={{ paddingLeft: 30 }}
               placeholder="Cliente, nº pedido, tipo de boné..."
               value={busca}
               onChange={e => setBusca(e.target.value)}

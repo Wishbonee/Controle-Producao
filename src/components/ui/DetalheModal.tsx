@@ -20,24 +20,24 @@ function imprimirOP(p: PedidoEnriquecido) {
   const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
     <title>OP #${p.num} — Wishbone</title>
     <style>
-      body { font-family: Arial, sans-serif; font-size: 13px; margin: 0; padding: 24px; color: #111; }
-      .op-header { background: #111; color: #fff; border-radius: 10px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+      body { font-family: Inter, 'Segoe UI', Arial, sans-serif; font-size: 13px; margin: 0; padding: 24px; color: #0f172a; }
+      .op-header { background: #0f172a; color: #fff; border-radius: 12px; border-left: 4px solid #14b8a6; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
       .op-header h1 { font-size: 18px; margin: 0; }
-      .op-header .num { font-size: 26px; font-weight: 900; color: #E4F901; }
+      .op-header .num { font-size: 26px; font-weight: 800; color: #5eead4; }
       .op-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; margin-bottom: 18px; }
-      .op-item { border-bottom: 1px solid #e5e5e5; padding: 7px 0; }
-      .op-label { font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: .6px; }
+      .op-item { border-bottom: 1px solid #e2e8f0; padding: 7px 0; }
+      .op-label { font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .6px; }
       .op-value { font-size: 14px; font-weight: 700; margin-top: 2px; }
       .op-qtd { font-size: 22px; font-weight: 900; }
-      .op-section { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .8px; margin: 18px 0 8px; border-bottom: 2px solid #E4F901; padding-bottom: 4px; }
+      .op-section { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .8px; margin: 18px 0 8px; border-bottom: 2px solid #14b8a6; padding-bottom: 4px; }
       .op-etapas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-      .op-etapa { display: flex; align-items: center; gap: 8px; font-weight: 700; padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; }
-      .op-etapa.atual { border-color: #111; background: #f5ffc4; }
-      .op-etapa .box { width: 16px; height: 16px; border: 2px solid #111; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
-      .op-obs { border: 1px dashed #bbb; border-radius: 8px; padding: 12px; min-height: 60px; font-size: 13px; }
+      .op-etapa { display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; }
+      .op-etapa.atual { border-color: #0f766e; background: #ccfbf1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .op-etapa .box { width: 16px; height: 16px; border: 2px solid #0f172a; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+      .op-obs { border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; min-height: 60px; font-size: 13px; }
       .op-foot { display: flex; justify-content: space-between; margin-top: 40px; gap: 24px; }
-      .op-ass { flex: 1; border-top: 1px solid #111; padding-top: 6px; text-align: center; font-size: 10px; color: #666; }
-      .gen { font-size: 10px; color: #999; margin-top: 22px; }
+      .op-ass { flex: 1; border-top: 1px solid #0f172a; padding-top: 6px; text-align: center; font-size: 10px; color: #64748b; }
+      .gen { font-size: 10px; color: #94a3b8; margin-top: 22px; }
       @media print { body { padding: 8px; } }
     </style></head><body>
     <div class="op-header">
@@ -108,14 +108,14 @@ export function DetalheModal() {
         <div className="modal-header">
           <div>
             <h2>#{pedido.num || 'S/N'} — {pedido.cliente}</h2>
-            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
+            <div className="modal-sub">
               {pedido.nomePedidoOriginal}{pedido.cor ? ` · ${pedido.cor}` : ''} · {pedido.qtd} un
             </div>
           </div>
           <button className="close-btn" onClick={closeDetalhe}><X size={18} /></button>
         </div>
 
-        <div className="modal-body" style={{ display: 'block' }}>
+        <div className="modal-body block">
           {/* Resumo */}
           <div className="det-badges">
             <span className={`status-wrap ${stClass(pedido.status_producao)}`}>{pedido.status_producao}</span>
@@ -180,11 +180,11 @@ export function DetalheModal() {
           }
         </div>
 
-        <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
+        <div className="modal-footer spread">
           <button className="btn" onClick={() => imprimirOP(pedido)}>
             <Printer size={14} /> Imprimir OP
           </button>
-          <div style={{ display: 'flex', gap: 9 }}>
+          <div className="modal-footer-group">
             <button className="btn" onClick={() => { closeDetalhe(); openModal('editar', pedido); }}>
               <Pencil size={14} /> Editar
             </button>

@@ -21,7 +21,7 @@ function DonutChart({ slices, size = 140 }: {
   return (
     <svg viewBox={`0 0 ${size} ${size}`} style={{ display: 'block', width: size, height: size, flexShrink: 0 }}>
       {total === 0 ? (
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--line, #eee)" strokeWidth={size * 0.13} />
+        <circle className="donut-track" cx={cx} cy={cy} r={r} fill="none" strokeWidth={size * 0.13} />
       ) : (
         slices.filter(s => s.value > 0).map((slice, i) => {
           const dash = (slice.value / total) * circ;
@@ -39,8 +39,8 @@ function DonutChart({ slices, size = 140 }: {
           );
         })
       )}
-      <circle cx={cx} cy={cy} r={r * 0.6} fill="var(--card, #fff)" />
-      <text x={cx} y={cy + 5} textAnchor="middle" fontSize={size * 0.14} fontWeight="900" fill="var(--text, #111)">
+      <circle className="donut-hole" cx={cx} cy={cy} r={r * 0.6} />
+      <text className="donut-total" x={cx} y={cy + 5} textAnchor="middle" fontSize={size * 0.14}>
         {total}
       </text>
     </svg>
@@ -148,13 +148,13 @@ function ProximasEntregas({ pedidos }: { pedidos: PedidoEnriquecido[] }) {
             <span className="d">{d!.getDate()}</span>
             <span className="m">{MESES_ABREV[d!.getMonth()]}</span>
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="delivery-body">
             <div className="delivery-nome">{p.cliente}</div>
             <div className="delivery-meta">{p.nomePedidoOriginal} · {p.qtd} un · {p.tecnica || '—'}</div>
           </div>
           <span
             className={`status-wrap ${p.status_producao === 'ATRASADO' ? 'st-atrasado' : 'st-em'}`}
-            style={{ fontSize: 10, flexShrink: 0 }}
+            style={{ flexShrink: 0 }}
           >
             {p.dias}
           </span>
@@ -181,10 +181,10 @@ export function Dashboard() {
     const c: Record<string, number> = {};
     pedidos.forEach(p => { c[p.status_producao] = (c[p.status_producao] ?? 0) + 1; });
     return [
-      { label: 'Em Produção', value: c['Em Produção'] ?? 0, color: '#fde047' },
+      { label: 'Em Produção', value: c['Em Produção'] ?? 0, color: '#f59e0b' },
       { label: 'Aguardando',  value: c['Aguardando']  ?? 0, color: '#fb923c' },
       { label: 'Enviado',     value: c['Enviado']     ?? 0, color: '#60a5fa' },
-      { label: 'Entregue',    value: c['Entregue']    ?? 0, color: '#4ade80' },
+      { label: 'Entregue',    value: c['Entregue']    ?? 0, color: '#34d399' },
       { label: 'Atrasado',    value: c['ATRASADO']    ?? 0, color: '#f87171' },
     ];
   }, [pedidos]);
@@ -193,7 +193,7 @@ export function Dashboard() {
     <>
       {/* ── KPIs ── */}
       <div className="kpis kpis-4">
-        <div className="kpi kpi-accent-yellow">
+        <div className="kpi kpi-accent-brand">
           <div className="kpi-icon"><HardHat size={20} /></div>
           <div className="kpi-label">Bonés em Produção</div>
           <div className="kpi-value">{stats.emAndamento}</div>
@@ -201,21 +201,21 @@ export function Dashboard() {
         </div>
 
         <div className="kpi kpi-accent-red">
-          <div className="kpi-icon" style={{ color: '#ef4444' }}><AlertTriangle size={20} /></div>
+          <div className="kpi-icon tone-red"><AlertTriangle size={20} /></div>
           <div className="kpi-label">Atrasados</div>
-          <div className="kpi-value" style={{ color: stats.atrasados > 0 ? 'var(--danger-text, #b91c1c)' : 'var(--text)' }}>
+          <div className={`kpi-value${stats.atrasados > 0 ? ' tone-red' : ''}`}>
             {stats.atrasados}
           </div>
           <div className="kpi-sub">de {stats.total} pedidos</div>
           {stats.total > 0 && (
             <div className="kpi-bar">
-              <div className="kpi-bar-fill" style={{ width: `${(stats.atrasados / stats.total) * 100}%`, background: '#ef4444' }} />
+              <div className="kpi-bar-fill fill-red" style={{ width: `${(stats.atrasados / stats.total) * 100}%` }} />
             </div>
           )}
         </div>
 
         <div className="kpi kpi-accent-green">
-          <div className="kpi-icon" style={{ color: '#16a34a' }}><CheckCircle size={20} /></div>
+          <div className="kpi-icon tone-green"><CheckCircle size={20} /></div>
           <div className="kpi-label">Entregues</div>
           <div className="kpi-value">{stats.entregues}</div>
           <div className="kpi-sub">
@@ -223,13 +223,13 @@ export function Dashboard() {
           </div>
           {stats.total > 0 && (
             <div className="kpi-bar">
-              <div className="kpi-bar-fill" style={{ width: `${(stats.entregues / stats.total) * 100}%`, background: '#4ade80' }} />
+              <div className="kpi-bar-fill fill-green" style={{ width: `${(stats.entregues / stats.total) * 100}%` }} />
             </div>
           )}
         </div>
 
         <div className="kpi kpi-accent-blue">
-          <div className="kpi-icon" style={{ color: '#3b82f6' }}><Clock size={20} /></div>
+          <div className="kpi-icon tone-blue"><Clock size={20} /></div>
           <div className="kpi-label">Pgto Pendente</div>
           <div className="kpi-value">{stats.pendentes}</div>
           <div className="kpi-sub">pedidos aguardando</div>
@@ -241,7 +241,7 @@ export function Dashboard() {
         <div className="dash-card">
           <div className="dash-card-header">
             <h3>Produção Mensal (bonés por mês de entrada)</h3>
-            <span style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 700 }}>últimos 6 meses</span>
+            <span className="dash-card-hint">últimos 6 meses</span>
           </div>
           <div className="dash-card-body">
             <MonthlyChart pedidos={pedidos} />
@@ -251,9 +251,9 @@ export function Dashboard() {
         <div className="dash-card">
           <div className="dash-card-header"><h3>Status dos Pedidos</h3></div>
           <div className="dash-card-body">
-            <div className="chart-wrap" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 16 }}>
+            <div className="chart-wrap stacked">
               <DonutChart slices={byStatus} size={110} />
-              <div className="chart-legend" style={{ width: '100%' }}>
+              <div className="chart-legend">
                 {byStatus.map(s => (
                   <div key={s.label} className="legend-row">
                     <div className="legend-dot" style={{ background: s.color }} />
@@ -272,7 +272,7 @@ export function Dashboard() {
         <div className="dash-card">
           <div className="dash-card-header">
             <h3>Ranking de Clientes</h3>
-            <Trophy size={14} style={{ color: '#fbbf24' }} />
+            <Trophy size={15} className="tone-amber" />
           </div>
           <div className="dash-card-body">
             {pedidos.length === 0
@@ -294,7 +294,7 @@ export function Dashboard() {
       <div className="dash-row">
         <div className="dash-card">
           <div className="dash-card-header"><h3>Volume por Técnica de Personalização</h3></div>
-          <div className="dash-card-body" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 10 }}>
+          <div className="dash-card-body tecnica-grid">
             {(() => {
               const byTecnica: Record<string, { pedidos: number; bonos: number }> = {};
               pedidos.forEach(p => {
@@ -306,15 +306,10 @@ export function Dashboard() {
               return Object.entries(byTecnica)
                 .sort((a, b) => b[1].bonos - a[1].bonos)
                 .map(([tecnica, s]) => (
-                  <div key={tecnica} style={{
-                    background: 'var(--subtle)', borderRadius: 10, padding: '12px 14px',
-                    borderLeft: '3px solid var(--yellow)',
-                  }}>
-                    <div style={{ fontWeight: 800, fontSize: 11, marginBottom: 4 }}>{tecnica}</div>
-                    <div style={{ fontSize: 20, fontWeight: 900 }}>{s.bonos.toLocaleString('pt-BR')}</div>
-                    <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>
-                      bonés · {s.pedidos} ped.
-                    </div>
+                  <div key={tecnica} className="tecnica-card">
+                    <div className="t">{tecnica}</div>
+                    <div className="v">{s.bonos.toLocaleString('pt-BR')}</div>
+                    <div className="s">bonés · {s.pedidos} ped.</div>
                   </div>
                 ));
             })()}

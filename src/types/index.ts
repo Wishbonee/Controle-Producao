@@ -16,6 +16,7 @@ export type ViewName =
   | 'urgentes'
   | 'clientes'
   | 'relatorios'
+  | 'contas'
   | 'configuracoes';
 
 /** Etapas internas de produção (aplicam-se a pedidos Em Produção/Atrasados) */
@@ -46,6 +47,8 @@ export interface Usuario {
   perfil: Perfil;
   ativo: boolean;
   criado_em: string;
+  /** Foto de perfil já reduzida, como data URL (null = iniciais) */
+  avatar_url?: string | null;
 }
 
 export type AcaoAuditoria =

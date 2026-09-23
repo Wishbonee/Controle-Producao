@@ -21,6 +21,10 @@ interface AppContextValue {
   perfil: Perfil | null;
   nome: string | null;
   isAdmin: boolean;
+  /** Registro de quem está logado (foto, data de criação...) */
+  meuUsuario: Usuario | null;
+  alterarMinhaSenha(senha: string): Promise<void>;
+  alterarMinhaFoto(url: string | null): Promise<void>;
   login(usuario: string, senha: string): Promise<boolean>;
   logout(): void;
 
@@ -54,8 +58,8 @@ interface AppContextValue {
   navigate(v: ViewName): void;
 
   // Tema
-  theme: 'light' | 'dark';
-  toggleTheme(): void;
+  tema: Tema;
+  setTema(t: Tema): void;
 
   // UI
   sidebarCollapsed: boolean;
@@ -82,6 +86,42 @@ interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | null>(null);
 
+/* ─── Tema e menu recolhido ─────────────────────────────────────
+   Mesmo contrato do Sistema de Orçamentos: três escolhas (claro,
+   escuro, sistema), chave `wishbone:tema` no localStorage e a
+   classe .dark no <html>. O index.html aplica a classe antes do
+   React montar; aqui ela só é mantida em dia.
+─────────────────────────────────────────────────────────────── */
+export type Tema = 'claro' | 'escuro' | 'sistema';
+
+const TEMA_KEY = 'wishbone:tema';
+const MENU_KEY = 'wishbone:menu-recolhido';
+const TEMAS: Tema[] = ['claro', 'escuro', 'sistema'];
+
+/** Abaixo desta largura a lateral vira gaveta (igual ao `lg` do orçamento). */
+export const DRAWER_BREAKPOINT = 1024;
+
+function lerTema(): Tema {
+  try {
+    const salvo = localStorage.getItem(TEMA_KEY) as Tema | null;
+    return salvo && TEMAS.includes(salvo) ? salvo : 'sistema';
+  } catch {
+    return 'sistema';
+  }
+}
+
+function prefereEscuro(): boolean {
+  return typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+}
+
+function lerMenuRecolhido(): boolean {
+  try {
+    return localStorage.getItem(MENU_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<string | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
@@ -92,22 +132,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [detalheId, setDetalheId] = useState<string | null>(null);
   const [view, setView] = useState<ViewName>('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Lido de forma síncrona: a tela já abre na largura certa, sem pular a cada F5
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(lerMenuRecolhido);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogOptions | null>(null);
-  // Escuro é o padrão — identidade wishbone.com.br
-  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
-    localStorage.getItem('wishbone_theme') === 'light' ? 'light' : 'dark'
-  );
+  const [tema, setTemaState] = useState<Tema>(lerTema);
 
+  // A classe no <html> é o que liga o bloco .dark do index.css
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('wishbone_theme', theme);
-  }, [theme]);
+    const escuro = tema === 'escuro' || (tema === 'sistema' && prefereEscuro());
+    document.documentElement.classList.toggle('dark', escuro);
+  }, [tema]);
 
-  const toggleTheme = useCallback(() => setTheme(t => (t === 'dark' ? 'light' : 'dark')), []);
+  // Em "sistema", trocar o tema do SO com a aba aberta reflete na hora
+  useEffect(() => {
+    if (tema !== 'sistema') return;
+    const query = window.matchMedia?.('(prefers-color-scheme: dark)');
+    if (!query) return;
+    const aplicar = () => document.documentElement.classList.toggle('dark', query.matches);
+    query.addEventListener('change', aplicar);
+    return () => query.removeEventListener('change', aplicar);
+  }, [tema]);
+
+  const setTema = useCallback((t: Tema) => {
+    if (!TEMAS.includes(t)) return;
+    setTemaState(t);
+    try {
+      localStorage.setItem(TEMA_KEY, t);
+    } catch {
+      // sem armazenamento, vale só para esta aba
+    }
+  }, []);
 
   // Stable refs so CRUD callbacks don't re-create on every pedido/user change
   const usuarioRef = useRef(usuario);
@@ -341,10 +398,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const navigate = useCallback((v: ViewName) => setView(v), []);
 
   const toggleSidebar = useCallback(() => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth < DRAWER_BREAKPOINT) {
       setMobileSidebarOpen(o => !o);
     } else {
-      setSidebarCollapsed(c => !c);
+      setSidebarCollapsed(c => {
+        try {
+          localStorage.setItem(MENU_KEY, c ? '0' : '1');
+        } catch {
+          // sem armazenamento, vale só para esta aba
+        }
+        return !c;
+      });
     }
   }, []);
   const closeMobileSidebar = useCallback(() => setMobileSidebarOpen(false), []);
@@ -391,17 +455,44 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await refreshUsuarios();
   }, [usuarios, refreshUsuarios]);
 
+  /* ─── Conta de quem está logado (tela de Configurações) ───
+     Não passa por updateUsuario: trocar a própria senha ou foto
+     não é gestão de usuários e não pede perfil de admin. */
+  const meuUsuario = usuario
+    ? usuarios.find(u => u.login.toLowerCase() === usuario.toLowerCase()) ?? null
+    : null;
+
+  const alterarMinhaSenha = useCallback(async (senha: string) => {
+    if (!meuUsuario) throw new Error('Usuário não encontrado');
+    await userStorage.update({ ...meuUsuario, senha });
+    auditStorage.log({
+      usuario: usuarioRef.current ?? 'sistema',
+      nome_usuario: nomeRef.current ?? 'Sistema',
+      acao: 'Editou usuário',
+      entidade_label: `${meuUsuario.nome} (${meuUsuario.login})`,
+      detalhes: 'Alterou a própria senha',
+    });
+    await refreshUsuarios();
+  }, [meuUsuario, refreshUsuarios]);
+
+  const alterarMinhaFoto = useCallback(async (url: string | null) => {
+    if (!meuUsuario) throw new Error('Usuário não encontrado');
+    await userStorage.update({ ...meuUsuario, avatar_url: url });
+    await refreshUsuarios();
+  }, [meuUsuario, refreshUsuarios]);
+
   const urgentCount = pedidos.filter(isUrgent).length;
 
   const value: AppContextValue = {
     usuario, perfil, nome, isAdmin: perfil === 'admin',
+    meuUsuario, alterarMinhaSenha, alterarMinhaFoto,
     login, logout,
     pedidos, loading, refresh, addPedido, importPedidos, updatePedido, removePedido, setStatus, setEtapa,
     detalheId, openDetalhe, closeDetalhe,
     clientes, addCliente, updateCliente, removeCliente,
     urgentCount,
     view, navigate,
-    theme, toggleTheme,
+    tema, setTema,
     sidebarCollapsed, mobileSidebarOpen, toggleSidebar, closeMobileSidebar,
     toast, showToast,
     modal, openModal, closeModal,

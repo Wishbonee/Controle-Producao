@@ -29,7 +29,6 @@ function KCard({ p, dragging, onDragStart, onDragEnd, onEntregue, onEdit, onDeta
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onClick={e => { if (!(e.target as HTMLElement).closest('button')) onDetalhe(); }}
-      style={{ cursor: 'pointer' }}
       title="Ver detalhes"
     >
       <div className="k-card-num">#{p.num || 'S/N'}</div>
@@ -42,9 +41,9 @@ function KCard({ p, dragging, onDragStart, onDragEnd, onEntregue, onEdit, onDeta
         <div className="etapa-chip">{p.etapa}</div>
       )}
       <div className="k-card-foot">
-        <span style={{ fontSize: 10, color: 'var(--muted)' }}>{p.entrega}</span>
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          <span className={`badge ${pgtoClass(p.status_pgto)}`} style={{ fontSize: 9 }}>{p.status_pgto}</span>
+        <span className="k-card-date">{p.entrega}</span>
+        <div className="k-card-acts">
+          <span className={`badge badge-sm ${pgtoClass(p.status_pgto)}`}>{p.status_pgto}</span>
           {p.status_producao !== 'Entregue' && (
             <button className="btn btn-icon btn-sm btn-green" title="Marcar entregue" onClick={onEntregue}>
               <CheckCircle size={12} />
